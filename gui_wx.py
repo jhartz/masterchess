@@ -231,22 +231,30 @@ def set_pref(prefname, prefvalue):
 
 class PrefFrame(wx.Frame):
     def __init__(self, parent=None):
-        wx.Frame.__init__(self, parent, title="MasterChess Preferences")
+        wx.Frame.__init__(self, parent, title="MasterChess Preferences", style=wx.DEFAULT_FRAME_STYLE ^ wx.MAXIMIZE_BOX)
         
+        if wx.Platform != "__WXMAC__":
+            self.SetIcon(wx.Icon(get_local_file("Chess.ico"), wx.BITMAP_TYPE_ICO))
+        
+        panel = wx.Panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
         
-        self.names_check = wx.CheckBox(self, label="Show only last names for players")
+        self.names_check = wx.CheckBox(panel, label="Show only last names for players")
         val = get_pref("last_names")
         if val:
             self.names_check.SetValue(True)
         sizer.Add(self.names_check, 0, wx.ALL, 10)
         
-        ok_button = wx.Button(self, wx.ID_OK)
+        ok_button = wx.Button(panel, wx.ID_OK)
         ok_button.SetDefault()
         self.Bind(wx.EVT_BUTTON, self.OnOK, ok_button)
         sizer.Add(ok_button, 0, wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, 10)
         
-        self.SetSizer(sizer)
+        panel.SetSizer(sizer)
+        
+        bigsizer = wx.BoxSizer(wx.HORIZONTAL)
+        bigsizer.Add(panel)
+        self.SetSizer(bigsizer)
         
         self.Fit()
         self.Center()
@@ -337,9 +345,9 @@ class MainFrame(wx.Frame):
             self.panelC.Hide()
             
             sizer = wx.BoxSizer(wx.VERTICAL)
-            sizer.Add(self.panelA, 1, wx.ALL | wx.EXPAND, 5)
-            sizer.Add(self.panelB, 1, wx.ALL | wx.EXPAND, 5)
-            sizer.Add(self.panelC, 1, wx.ALL | wx.EXPAND, 5)
+            sizer.Add(self.panelA, 1, wx.ALL | wx.EXPAND)
+            sizer.Add(self.panelB, 1, wx.ALL | wx.EXPAND)
+            sizer.Add(self.panelC, 1, wx.ALL | wx.EXPAND)
             self.SetSizer(sizer)
             
             self.Layout()
@@ -699,6 +707,7 @@ class MatchesPanel(wx.Panel):
             elif match.outcome == 2:
                 outcome = "Stalemate"
             
+            # TODO: Put winning player in bold!
             index = self.list.InsertStringItem(sys.maxint, self.get_name(player=white_player))
             self.itemindexes[index] = match.id
             self.list.SetStringItem(index, 1, self.get_name(player=black_player))
