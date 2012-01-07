@@ -64,7 +64,6 @@ class mc(object):
             try:
                 self._db_conn.close()
                 self.isinit = False
-                print >> sys.stderr, "Closed", self.db_path
             except:
                 pass
     

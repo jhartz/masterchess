@@ -38,7 +38,7 @@ options = {
     "license": "GPL"
 }
 
-if sys.platform == "darwin" and sys.argv[1] == "py2app":
+if sys.platform == "darwin" and "py2app" in sys.argv:
     options.update({
         "setup_requires": ["py2app"],
         "app": ["gui_wx.py"],
@@ -83,7 +83,8 @@ if sys.platform == "darwin" and sys.argv[1] == "py2app":
             }
         }
     })
-elif sys.platform == "win32":
+elif sys.platform == "win32" and "py2exe" in sys.argv:
+    import py2exe
     options.update({
         "setup_requires": ["py2exe"],
         "data_files": DATA_FILES + get_folder(DATA_MODULE_PACKAGES),
@@ -113,11 +114,14 @@ else:
 setup(**options)
 
 
-if sys.platform == "darwin" and sys.argv[1] == "py2app":
-    # If we have a compiled MC-QuickLook mc MC-Spotlight, include that
+if sys.platform == "darwin" and "py2app" in sys.argv:
+    # If we have a compiled MC-QuickLook or MC-Spotlight, include that
     if os.path.isdir(os.path.join("dist", "MasterChess.app", "Contents")):
         # QuickLook
         loc = os.path.join("Mac components", "MC-QuickLook", "Build", "Release", "MC-QuickLook.qlgenerator")
+        if not os.path.exists(loc):
+            # Try debug version
+            loc = os.path.join("Mac components", "MC-QuickLook", "Build", "Debug", "MC-QuickLook.qlgenerator")
         if os.path.exists(loc):
             print ""
             print "Copying MC-QuickLook to app bundle"
@@ -130,7 +134,10 @@ if sys.platform == "darwin" and sys.argv[1] == "py2app":
                 print "Error calling qlmanage (manually call `qlmanage -r` and `qlmanage -r cache` to reload quicklookd)"
         
         # Spotlight
-        loc = os.path.join("Mac components", "MC-Spotlight", "Build", "Debug", "MC-Spotlight.mdimporter")
+        loc = os.path.join("Mac components", "MC-Spotlight", "Build", "Release", "MC-Spotlight.mdimporter")
+        if not os.path.exists(loc):
+            # Try debug version
+            loc = os.path.join("Mac components", "MC-Spotlight", "Build", "Debug", "MC-Spotlight.mdimporter")
         if os.path.exists(loc):
             print ""
             print "Copying MC-Spotlight to app bundle"
