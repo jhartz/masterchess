@@ -289,7 +289,20 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnNew, file_new)
         file_open = file_menu.Append(wx.ID_OPEN, "&Open Database\tCtrl+O", "Open an already-created chess team database")
         self.Bind(wx.EVT_MENU, self.OnOpen, file_open)
-        file_options = file_menu.Append(wx.ID_PREFERENCES, "&Options", "Set MasterChess options")
+        
+        recentDBs = get_recent_databases()
+        if len(recentDBs) > 0:
+            file_recent = wx.Menu()
+            def addHandler(path, button):
+                self.Bind(wx.EVT_MENU, lambda event: self.OnRecentDB(event, path), button)
+            for path in recentDBs:
+                item = file_recent.Append(wx.ID_ANY, os.path.basename(path), path)
+                addHandler(path, item)
+            file_menu.AppendSubMenu(file_recent, "&Recent Databases")
+        
+        if wx.Platform != "__WXMAC__":
+            file_menu.AppendSeparator()
+        file_options = file_menu.Append(wx.ID_PREFERENCES, "&Options")
         self.Bind(wx.EVT_MENU, self.OnPrefs, file_options)
         file_quit = file_menu.Append(wx.ID_EXIT, "&Exit All\tCtrl+Q", "Close all open MasterChess windows")
         self.Bind(wx.EVT_MENU, self.OnQuit, file_quit)
@@ -298,7 +311,7 @@ class MainFrame(wx.Frame):
         help_menu = wx.Menu()
         help_email = help_menu.Append(wx.ID_ANY, "&Email Jake Hartz", "Email Jake Hartz with any questions or problems")
         self.Bind(wx.EVT_MENU, self.OnEmail, help_email)
-        help_about = help_menu.Append(wx.ID_ABOUT, "&About MasterChess", "Information about MasterChess")
+        help_about = help_menu.Append(wx.ID_ABOUT, "&About MasterChess")
         self.Bind(wx.EVT_MENU, self.OnAbout, help_about)
         menubar.Append(help_menu, "&Help")
         
@@ -461,7 +474,7 @@ class MainFrame(wx.Frame):
         menu_prefs()
     
     def OnClose(self, event):
-        if self.mc:
+        if hasattr(self, "mc") and self.mc:
             self.mc.uninit()
         
         self.Destroy()
@@ -470,7 +483,7 @@ class MainFrame(wx.Frame):
         wx.Exit()
     
     def OnRecentDB(self, event, path):
-        if self.load_database(path) == False:
+        if not os.path.exists(path) or self.load_database(path) == False:
             remove_recent_database(path)
             msgdlg = wx.MessageDialog(self, "There was an error opening " + path, "Database Error", wx.OK | wx.ICON_ERROR)
             msgdlg.ShowModal()
@@ -1470,29 +1483,7 @@ class MyApp(wx.App):
     def OnInit(self):
         if wx.Platform == "__WXMAC__":
             self.SetExitOnFrameDelete(False)
-            
-            # NOTE: Same menubar spec exists at top!
-            menubar = wx.MenuBar()
-            
-            file_menu = wx.Menu()
-            file_new = file_menu.Append(wx.ID_NEW, "&New Database\tCtrl+N", "Create a new chess team database")
-            self.Bind(wx.EVT_MENU, self.OnNew, file_new)
-            file_open = file_menu.Append(wx.ID_OPEN, "&Open Database\tCtrl+O", "Open an already-created chess team database")
-            self.Bind(wx.EVT_MENU, self.OnOpen, file_open)
-            file_options = file_menu.Append(wx.ID_PREFERENCES, "&Options", "Set MasterChess options")
-            self.Bind(wx.EVT_MENU, self.OnPrefs, file_options)
-            file_quit = file_menu.Append(wx.ID_EXIT, "&Exit All\tCtrl+Q", "Close all open MasterChess windows")
-            self.Bind(wx.EVT_MENU, self.OnQuit, file_quit)
-            menubar.Append(file_menu, "&File")
-            
-            help_menu = wx.Menu()
-            help_email = help_menu.Append(wx.ID_ANY, "&Email Jake Hartz", "Email Jake Hartz with any questions or problems")
-            self.Bind(wx.EVT_MENU, self.OnEmail, help_email)
-            help_about = help_menu.Append(wx.ID_ABOUT, "&About MasterChess", "Information about MasterChess")
-            self.Bind(wx.EVT_MENU, self.OnAbout, help_about)
-            menubar.Append(help_menu, "&Help")
-            
-            wx.MenuBar.MacSetCommonMenuBar(menubar)
+        self.load_menu_bar()
         
         something_loaded = False
         for f in sys.argv[1:]:
@@ -1522,6 +1513,13 @@ class MyApp(wx.App):
     def OnOpen(self, event):
         menu_open(self)
     
+    def OnRecentDB(self, event, path):
+        if not os.path.exists(path) or self.load_database(path) == False:
+            remove_recent_database(path)
+            msgdlg = wx.MessageDialog(None, "There was an error opening " + path, "Database Error", wx.OK | wx.ICON_ERROR)
+            msgdlg.ShowModal()
+            msgdlg.Destroy()
+    
     def load_database(self, path):
         topwin = self.GetTopWindow()
         if topwin:
@@ -1529,6 +1527,44 @@ class MyApp(wx.App):
         else:
             MainFrame(auto_load_database=path)
             return True
+    
+    def load_menu_bar(self):
+        if wx.Platform == "__WXMAC__":
+            # NOTE: Same menubar spec exists at top!
+            menubar = wx.MenuBar()
+            
+            file_menu = wx.Menu()
+            file_new = file_menu.Append(wx.ID_NEW, "&New Database\tCtrl+N", "Create a new chess team database")
+            self.Bind(wx.EVT_MENU, self.OnNew, file_new)
+            file_open = file_menu.Append(wx.ID_OPEN, "&Open Database\tCtrl+O", "Open an already-created chess team database")
+            self.Bind(wx.EVT_MENU, self.OnOpen, file_open)
+            
+            recentDBs = get_recent_databases()
+            if len(recentDBs) > 0:
+                file_recent = wx.Menu()
+                def addHandler(path, button):
+                    self.Bind(wx.EVT_MENU, lambda event: self.OnRecentDB(event, path), button)
+                for path in recentDBs:
+                    item = file_recent.Append(wx.ID_ANY, os.path.basename(path), path)
+                    addHandler(path, item)
+                file_menu.AppendSubMenu(file_recent, "&Recent Databases")
+            
+            if wx.Platform != "__WXMAC__":
+                file_menu.AppendSeparator()
+            file_options = file_menu.Append(wx.ID_PREFERENCES, "&Options")
+            self.Bind(wx.EVT_MENU, self.OnPrefs, file_options)
+            file_quit = file_menu.Append(wx.ID_EXIT, "&Exit All\tCtrl+Q", "Close all open MasterChess windows")
+            self.Bind(wx.EVT_MENU, self.OnQuit, file_quit)
+            menubar.Append(file_menu, "&File")
+            
+            help_menu = wx.Menu()
+            help_email = help_menu.Append(wx.ID_ANY, "&Email Jake Hartz", "Email Jake Hartz with any questions or problems")
+            self.Bind(wx.EVT_MENU, self.OnEmail, help_email)
+            help_about = help_menu.Append(wx.ID_ABOUT, "&About MasterChess", "Information about MasterChess")
+            self.Bind(wx.EVT_MENU, self.OnAbout, help_about)
+            menubar.Append(help_menu, "&Help")
+            
+            wx.MenuBar.MacSetCommonMenuBar(menubar)
     
     def BringWindowToFront(self):
         topwin = self.GetTopWindow()
