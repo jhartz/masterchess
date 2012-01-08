@@ -246,6 +246,12 @@ class PrefFrame(wx.Frame):
             self.names_check.SetValue(True)
         sizer.Add(self.names_check, 0, wx.ALL, 10)
         
+        self.colors_check = wx.CheckBox(panel, label="Don't colorize items in the Matches panel based on match outcome")
+        val = get_pref("dont_colorize_matches")
+        if val:
+            self.colors_check.SetValue(True)
+        sizer.Add(self.colors_check, 0, wx.ALL, 10)
+        
         ok_button = wx.Button(panel, wx.ID_OK)
         ok_button.SetDefault()
         self.Bind(wx.EVT_BUTTON, self.OnOK, ok_button)
@@ -263,6 +269,7 @@ class PrefFrame(wx.Frame):
     
     def OnOK(self, event):
         set_pref("last_names", self.names_check.GetValue())
+        set_pref("dont_colorize_matches", self.colors_check.GetValue())
         self.Destroy()
 
 
@@ -660,18 +667,23 @@ class MatchesPanel(wx.Panel):
         
         new_button = wx.Button(self, label="New match", style=wx.ALIGN_LEFT)
         self.Bind(wx.EVT_BUTTON, self.OnNew, new_button)
-        # TODO: Listen to onchange or whatever on this so when someone starts typing we can filter out matches that don't have players with these names (and, please, make this text box look nicer - maybe make it into a combo box where the drop-down list can have all the players in it - just last names if the last name pref is on (and we just filter on last names if it's on), otherwise full names)
-        self.filter_box = wx.TextCtrl(self)
+        
+        self.filter_box = wx.ComboBox(self)
+        self.Bind(wx.EVT_COMBOBOX, self.OnFilter, self.filter_box)
+        self.Bind(wx.EVT_TEXT, self.OnFilter, self.filter_box)
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnFilter, self.filter_box)
+        
         self.disable_checkbox = wx.CheckBox(self, label="Show disabled matches")
         self.disable_checkbox.SetToolTip(wx.ToolTip("Disabled matches are not used to help calculate any rankings, scores, or statistics."))
         self.Bind(wx.EVT_CHECKBOX, self.OnCheck, self.disable_checkbox)
+        
         hbox = wx.BoxSizer(wx.HORIZONTAL)
-        hbox.Add(new_button)
+        hbox.Add(new_button, 0, wx.ALIGN_CENTER_VERTICAL)
         hbox.Add((15, 1), 1)
-        hbox.Add(wx.StaticText(self, label="Filter: "))
-        hbox.Add(self.filter_box)
+        hbox.Add(wx.StaticText(self, label="Filter: "), 0, wx.ALIGN_CENTER_VERTICAL)
+        hbox.Add(self.filter_box, 0, wx.ALIGN_CENTER_VERTICAL)
         hbox.Add((15, 1), 1)
-        hbox.Add(self.disable_checkbox)
+        hbox.Add(self.disable_checkbox, 0, wx.ALIGN_CENTER_VERTICAL)
         
         sizer.Add(hbox, 0, wx.ALL | wx.EXPAND, 5)
         
@@ -693,42 +705,83 @@ class MatchesPanel(wx.Panel):
         if self.list.GetColumnCount() == 4 and not self.exclude_disabled:
             self.list.InsertColumn(4, "Enabled")
         
+        self.init_list()
+        
+        self.filter_box.Clear()
+        for p in self.mc.get_players():
+            self.filter_box.Append(self.get_name(player=p), p.id)
+        
+        self.Layout()
+    
+    def init_list(self, no_filter=False):
         self.itemindexes = {}
         self.list.DeleteAllItems()
+        
+        filtertext = ""
+        if not no_filter:
+            filtertext = self.filter_box.GetValue()
         
         matches = self.mc.get_matches(exclude_disabled=self.exclude_disabled)
         for match in matches:
             white_player = self.mc.get_players(match.white_player)[0]
             black_player = self.mc.get_players(match.black_player)[0]
-            outcome = "Draw"
-            if match.outcome == 0:
-                outcome = "White victory"
-            elif match.outcome == 1:
-                outcome = "Black victory"
-            elif match.outcome == 2:
-                outcome = "Stalemate"
             
-            # TODO: Put winning player in bold!
-            index = self.list.InsertStringItem(sys.maxint, self.get_name(player=white_player))
-            self.itemindexes[index] = match.id
-            self.list.SetStringItem(index, 1, self.get_name(player=black_player))
-            self.list.SetStringItem(index, 2, outcome)
-            self.list.SetStringItem(index, 3, datetime.date.fromtimestamp(match.timestamp).strftime("%m/%d/%y"))
-            if not self.exclude_disabled:
-                self.list.SetStringItem(index, 4, match.enabled and "Yes" or "No")
+            isgood = False
+            iscomma = "," in filtertext
+            filter = filtertext.lower().split(",")
+            against = [self.get_name(player=white_player).lower(), self.get_name(player=black_player).lower()]
+            for f in filter:
+                if not iscomma or len(f.strip()) > 0:
+                    for a in against:
+                        if f.strip() in a:
+                            isgood = True
+            
+            if isgood:
+                outcome = "Draw"
+                if match.outcome == 0:
+                    outcome = "White victory"
+                elif match.outcome == 1:
+                    outcome = "Black victory"
+                elif match.outcome == 2:
+                    outcome = "Stalemate"
+                
+                index = self.list.InsertStringItem(sys.maxint, self.get_name(player=white_player))
+                if not get_pref("dont_colorize_matches"):
+                    diff = 0
+                    if not self.exclude_disabled and not match.enabled:
+                        diff = 10
+                    if match.outcome == 0:
+                        self.list.SetItemBackgroundColour(index, (245 + diff, 245 + diff, 245 + diff))
+                        self.list.SetItemTextColour(index, wx.BLACK)
+                    elif match.outcome == 1:
+                        self.list.SetItemBackgroundColour(index, (0 + diff, 0 + diff, 0 + diff))
+                        self.list.SetItemTextColour(index, wx.WHITE)
+                    else:
+                        self.list.SetItemBackgroundColour(index, (190 + diff, 190 + diff, 190 + diff))
+                        self.list.SetItemTextColour(index, wx.BLACK)
+                self.itemindexes[index] = match.id
+                self.list.SetStringItem(index, 1, self.get_name(player=black_player))
+                self.list.SetStringItem(index, 2, outcome)
+                self.list.SetStringItem(index, 3, datetime.date.fromtimestamp(match.timestamp).strftime("%m/%d/%y"))
+                if not self.exclude_disabled:
+                    self.list.SetStringItem(index, 4, match.enabled and "Yes" or "No")
         
         for column in xrange(4):
             self.list.SetColumnWidth(column, wx.LIST_AUTOSIZE)
             oldwidth = self.list.GetColumnWidth(column)
             self.list.SetColumnWidth(column, wx.LIST_AUTOSIZE_USEHEADER)
             if oldwidth > self.list.GetColumnWidth(column): self.list.SetColumnWidth(column, wx.LIST_AUTOSIZE)
-        
-        self.Layout()
     
     def OnCheck(self, event):
         self.exclude_disabled = not self.disable_checkbox.GetValue()
         self.Freeze()
         self.reinit()
+        self.Thaw()
+    
+    def OnFilter(self, event):
+        print "Filtering on:", self.filter_box.GetValue()
+        self.Freeze()
+        self.init_list()
         self.Thaw()
     
     def OnListKeyDown(self, event):
