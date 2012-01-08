@@ -255,8 +255,12 @@ class mc(object):
     
     def get_grand_table(self, ids=[], full_names=True):
         """Return a dict (Struct) containing "rows", "column_headers", and "row_headers", in which "rows" contains all the players and their scores against each of their opponents (represented by a list of rows, in which each row (list item) contains a list of column values for that row)."""
-        # TODO: Exclude a column if person isn't in ids (if len(ids) > 0) and their column has absolutely NO data
-        # TODO: return None for a cell if no matches have been played at all between the player (row) and its opponent (column)
+        if not isinstance(ids, list):
+            if ids:
+                ids = [ids]
+            else:
+                ids = []
+        
         if full_names == "db":
             pref = self.get_pref("last_names")
             if pref:
@@ -272,6 +276,7 @@ class mc(object):
         for i in self.get_players():
             all_ids.append(i.id)
             all_players[i.id] = i
+        
         def get_name(id):
             if full_names:
                 return all_players[id].first_name + " " + all_players[id].last_name
@@ -291,12 +296,33 @@ class mc(object):
                 player_data = self.get_players(id, player.id)[0]
                 score = player_data.stats.wins + player_data.stats.stalemates * 0.5 + player_data.stats.draws * 0.5
                 total_score += score
-                row.append(score)
+                if player_data.stats.total > 0:
+                    row.append(score)
+                else:
+                    row.append(None)
                 if not index in column_totals:
                     column_totals[index] = 0
                 column_totals[index] += score
             row.append(total_score)
             rows.append(row)
+        
+        if ids != all_ids:
+            old_rows = [[j for j in i] for i in rows]
+            column_diff = 0
+            for index, player_id in enumerate([i for i in all_ids]):
+                if player_id not in ids:
+                    no_values = True
+                    for row in old_rows:
+                        if row[index] != None:
+                            no_values = False
+                    if no_values:
+                        all_ids.remove(player_id)
+                        del column_totals[index]
+                        for row_index, row in enumerate(old_rows):
+                            # I see the problem... We're still deleting a certain index from newrows, even though it doesn't really exist
+                            del rows[row_index][index - column_diff]
+                        column_diff += 1
+        
         new_column_totals = sorted([(index, score) for index, score in column_totals.iteritems()])
         rows.append([value for index, value in new_column_totals])
         column_headers = [(id, "vs. " + get_name(id)) for id in all_ids] + ["TOTAL WINS"]
