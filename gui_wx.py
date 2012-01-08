@@ -1162,19 +1162,22 @@ class StatisticsTab(wx.Panel):
         wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
         self.mc = parent.mc
         
+        self.curplayer = None
+        
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self.sizer)
         
         #self.reinit()
     
     def reinit(self):
+        players = self.mc.get_players()
         stats = self.mc.get_stats()
+        use_last_names = get_pref("last_names")
         self.sizer.Clear(True)
         
         self.selector = wx.Choice(self)
         self.selector.Select(self.selector.Append("Overall Statistics"))
-        use_last_names = get_pref("last_names")
-        for player in self.mc.get_players():
+        for player in players:
             namer = ""
             if use_last_names:
                 namer = player.last_name
@@ -1184,7 +1187,27 @@ class StatisticsTab(wx.Panel):
         self.Bind(wx.EVT_CHOICE, self.ChoiceSelect, self.selector)
         self.sizer.Add(self.selector, 0, wx.ALL | wx.EXPAND, 25)
         
-        #self.textsizer = wx.BoxSizer(wx.VERTICAL)
+        mainsizer = wx.BoxSizer(wx.HORIZONTAL)
+        
+        self.rightsizer = wx.BoxSizer(wx.VERTICAL)  # Ironic... it's actually on the left
+        self.checklabel = wx.StaticText(self, label="Verses:")
+        self.rightsizer.Add(self.checklabel)
+        
+        self.checked_players = wx.CheckListBox(self)
+        for player in players:
+            namer = ""
+            if use_last_names:
+                namer = player.last_name
+            else:
+                namer = player.first_name + " " + player.last_name
+            self.checked_players.Append(namer, player.id)
+        self.rightsizer.Add(self.checked_players, 0, wx.EXPAND)
+        self.select_all()
+        self.Bind(wx.EVT_CHECKLISTBOX, self.CheckSelect, self.checked_players)
+        
+        mainsizer.Add(self.rightsizer, 0, (wx.ALL ^ wx.TOP), 25)
+        self.rightsizer.ShowItems(False)
+        
         self.textsizer = wx.FlexGridSizer(wx.VERTICAL)
         self.textsizer.SetCols(3)
         
@@ -1209,70 +1232,107 @@ class StatisticsTab(wx.Panel):
         add_text("Total matches:", wx.ALIGN_RIGHT)
         add_text(str(stats.totals.matches))
         
-        self.sizer.Add(self.textsizer, 0, (wx.ALL ^ wx.TOP), 25)
+        mainsizer.Add(self.textsizer, 0, (wx.ALL ^ wx.TOP), 25)
         
+        self.sizer.Add(mainsizer)
         self.Layout()
+    
+    def select_all(self):
+        [self.checked_players.Check(i, True) for i in range(self.checked_players.GetCount())]
     
     def ChoiceSelect(self, event):
         sel = self.selector.GetSelection()
         if sel != wx.NOT_FOUND and self.selector.GetClientData(sel):
-            player = self.mc.get_players(self.selector.GetClientData(sel))[0]
-            self.textsizer.Clear(True)
+            self.curplayer = self.selector.GetClientData(sel)
+            player = self.mc.get_players(self.curplayer)[0]
             if player.stats.total > 0:
-                white_wins = float(player.stats.white_wins) / float(player.stats.total)
-                white_losses = float(player.stats.white_losses) / float(player.stats.total)
-                black_wins = float(player.stats.black_wins) / float(player.stats.total)
-                black_losses = float(player.stats.black_losses) / float(player.stats.total)
-                stalemates = float(player.stats.stalemates) / float(player.stats.total)
-                draws = float(player.stats.draws) / float(player.stats.total)
-                
-                add_text = lambda text, flags=0: self.textsizer.Add(wx.StaticText(self, label=text), 0, wx.ALL | flags, 3)
-                
-                add_text("White wins:", wx.ALIGN_RIGHT)
-                add_text(str(player.stats.white_wins))
-                add_text("(" + str(int(round(white_wins * 100))) + "%)")
-                
-                add_text("White losses:", wx.ALIGN_RIGHT)
-                add_text(str(player.stats.white_losses))
-                add_text("(" + str(int(round(white_losses * 100))) + "%)")
-                
-                add_text(" ")
-                add_text(" ")
-                add_text(" ")
-                
-                add_text("Black wins:", wx.ALIGN_RIGHT)
-                add_text(str(player.stats.black_wins))
-                add_text("(" + str(int(round(black_wins * 100))) + "%)")
-                
-                add_text("Black losses:", wx.ALIGN_RIGHT)
-                add_text(str(player.stats.black_losses))
-                add_text("(" + str(int(round(black_losses * 100))) + "%)")
-                
-                add_text(" ")
-                add_text(" ")
-                add_text(" ")
-                
-                add_text("Stalemates:", wx.ALIGN_RIGHT)
-                add_text(str(player.stats.stalemates))
-                add_text("(" + str(int(round(stalemates * 100))) + "%)")
-                
-                add_text("Draws:", wx.ALIGN_RIGHT)
-                add_text(str(player.stats.draws))
-                add_text("(" + str(int(round(draws * 100))) + "%)")
-                
-                add_text(" ")
-                add_text(" ")
-                add_text(" ")
-                
-                add_text("Total matches:", wx.ALIGN_RIGHT)
-                add_text(str(player.stats.total))
+                self.setup_stats()
+                self.rightsizer.ShowItems(True)
+                self.select_all()
             else:
+                self.textsizer.Clear(True)
                 self.textsizer.Add(wx.StaticText(self, label="No matches found for " + player.first_name + " " + player.last_name))
+                self.rightsizer.ShowItems(False)
             self.Layout()
         else:
+            self.curplayer = None
             self.Freeze()
             self.reinit()
             self.Thaw()
+    
+    def CheckSelect(self, event):
+        self.setup_stats([self.checked_players.GetClientData(i) for i in range(self.checked_players.GetCount()) if self.checked_players.IsChecked(i)])
+    
+    def setup_stats(self, verses=[]):
+        self.textsizer.Clear(True)
+        player = self.mc.get_players([self.curplayer], verses)[0]
+        if player.stats.total > 0:
+            white_wins = float(player.stats.white_wins) / float(player.stats.total)
+            white_losses = float(player.stats.white_losses) / float(player.stats.total)
+            black_wins = float(player.stats.black_wins) / float(player.stats.total)
+            black_losses = float(player.stats.black_losses) / float(player.stats.total)
+            stalemates = float(player.stats.stalemates) / float(player.stats.total)
+            draws = float(player.stats.draws) / float(player.stats.total)
+            
+            add_text = lambda text, flags=0: self.textsizer.Add(wx.StaticText(self, label=text), 0, wx.ALL | flags, 3)
+            
+            add_text("White wins:", wx.ALIGN_RIGHT)
+            add_text(str(player.stats.white_wins))
+            add_text("(" + str(int(round(white_wins * 100))) + "%)")
+            
+            add_text("White losses:", wx.ALIGN_RIGHT)
+            add_text(str(player.stats.white_losses))
+            add_text("(" + str(int(round(white_losses * 100))) + "%)")
+            
+            add_text(" ")
+            add_text(" ")
+            add_text(" ")
+            
+            add_text("Black wins:", wx.ALIGN_RIGHT)
+            add_text(str(player.stats.black_wins))
+            add_text("(" + str(int(round(black_wins * 100))) + "%)")
+            
+            add_text("Black losses:", wx.ALIGN_RIGHT)
+            add_text(str(player.stats.black_losses))
+            add_text("(" + str(int(round(black_losses * 100))) + "%)")
+            
+            add_text(" ")
+            add_text(" ")
+            add_text(" ")
+            
+            add_text("Stalemates:", wx.ALIGN_RIGHT)
+            add_text(str(player.stats.stalemates))
+            add_text("(" + str(int(round(stalemates * 100))) + "%)")
+            
+            add_text("Draws:", wx.ALIGN_RIGHT)
+            add_text(str(player.stats.draws))
+            add_text("(" + str(int(round(draws * 100))) + "%)")
+            
+            add_text(" ")
+            add_text(" ")
+            add_text(" ")
+            
+            add_text("Total matches:", wx.ALIGN_RIGHT)
+            add_text(str(player.stats.total))
+        else:
+            use_last_names = get_pref("last_names")
+            against = "Nobody"
+            if len(verses) > 0:
+                against_list = []
+                for p in self.mc.get_players(verses):
+                    if use_last_names:
+                        against_list.append(p.last_name)
+                    else:
+                        against_list.append(p.first_name + " " + p.last_name)
+                if len(against_list) == 1:
+                    against = against_list[0]
+                elif len(against_list) == 2:
+                    against = against_list[0] + " or " + against_list[1]
+                else:
+                    against = ", ".join(against_list[:-1])
+                    against += ", or " + against_list[-1]
+            self.textsizer.Add(wx.StaticText(self, label="No matches found for " + player.first_name + " " + player.last_name + " against " + against))
+        self.Layout()
 
 class RankingsTab(wx.Panel):
     def __init__(self, parent):
