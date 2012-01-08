@@ -158,6 +158,7 @@ def menu_about():
             license = newlicense
     if wx.Platform != "__WXMAC__":
         info.SetLicense(license)
+        info.SetWebSite("http://jake33.github.com/MasterChess/")
         info.SetIcon(wx.Icon(get_local_file("Chess-48.png"), wx.BITMAP_TYPE_PNG))
         info.SetDescription(__description__)
     else:
