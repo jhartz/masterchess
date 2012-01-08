@@ -1060,9 +1060,16 @@ class MyGridTable(wx.grid.PyGridTableBase):
     def GetAttr(self, row, col, param):
         attr = wx.grid.GridCellAttr()
         attr.SetAlignment(wx.ALIGN_CENTER, wx.ALIGN_CENTER)
+        
+        selrow = self.grid.GetGridCursorRow()
+        selcol = self.grid.GetGridCursorCol()
+        if (selrow == row and selcol >= col) or (selcol == col and selrow >= row):
+            attr.SetBackgroundColour((230, 230, 230))
+        
         if row == len(self.tbl.row_headers) - 1 or col == len(self.tbl.column_headers) - 1:
             attr.SetReadOnly(True)
             attr.SetFont(wx.Font(wx.SystemSettings.GetFont(0).GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.FONTWEIGHT_BOLD))
+            attr.SetBackgroundColour((190, 190, 190))
         return attr
     
     def SetValue(self, row, col, value):
@@ -1072,6 +1079,7 @@ class MyGridTable(wx.grid.PyGridTableBase):
             return False
         
         oldval = self.tbl.rows[row][col]
+        if oldval == None: oldval = 0
         if val - oldval in [0.5, 1]:
             # New win or draw
             dlg = wx.SingleChoiceDialog(self.parent, "Please select the white player:", "New Match", [self.tbl.row_headers[row][1], self.tbl.column_headers[col][1][4:]])
@@ -1098,6 +1106,15 @@ class MyGridTable(wx.grid.PyGridTableBase):
                 else:
                     self.mc.add_match(white_player_id, black_player_id, outcome)
                     self.tbl.rows[row][col] = val
+                    
+                    # Update corresponding row/col (ie. row "Adams", column "Foley" translates to row "Foley", column "Adams")
+                    # TODO: We need to get col references based on player IDs, since the rows and the columns might not always be the same (well... they should be as long as we don't pass any specific IDs to get_grand_table)
+                    if val - oldval == 0.5:
+                        if self.tbl.rows[col][row] == None: self.tbl.rows[col][row] = 0
+                        self.tbl.rows[col][row] += 0.5
+                    elif val - oldval == 1:
+                        if self.tbl.rows[col][row] == None: self.tbl.rows[col][row] = 0
+                    
                     self.grid.ForceRefresh()
                     return True
             else:
@@ -1155,6 +1172,10 @@ class ResultsTab(wx.Panel):
             self.grid.SetColLabelSize(maxHeight)
         
         self.grid.FitInside()
+        self.grid.DisableDragColMove()
+        self.grid.DisableDragColSize()
+        self.grid.DisableDragGridSize()
+        self.grid.DisableDragRowSize()
         self.Layout()
 
 class StatisticsTab(wx.Panel):
