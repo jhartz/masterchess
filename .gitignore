@@ -1,5 +1,5 @@
 *.pyc
 build
 dist
-Mac components/MC-QuickLook/Build
-Mac components/MC-Spotlight/Build
+Mac components/MC-QuickLook/build
+Mac components/MC-Spotlight/build
