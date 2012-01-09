@@ -1,1 +1,5 @@
 *.pyc
+build
+dist
+Mac components/MC-QuickLook/Build
+Mac components/MC-Spotlight/Build
