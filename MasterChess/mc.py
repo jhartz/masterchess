@@ -32,22 +32,6 @@ class Struct(dict):
         # Slightly prettier than default (object keys aren't put through repr)
         return "{" + ", ".join("%s: %s" % (key, repr(value)) for (key, value) in self.iteritems()) + "}"
 
-class _PrettyList(list):
-    """A list with a prettier repr."""
-    
-    def __repr__(self, indent=1):
-        """Show each list item indented on its own line."""
-        # We don't have to indent this first bracket - we can assume it was already indented by parent _PrettyList
-        returning = "["
-        for i in self:
-            returning += "\n" + "    " * indent
-            if isinstance(i, list):
-                returning += _PrettyList.__repr__(_PrettyList(i), indent + 1)
-            else:
-                returning += repr(i)
-        returning += "\n" + "    " * (indent - 1) + "]"
-        return returning
-
 class mc(object):
     """MasterChess base class."""
     
@@ -216,7 +200,7 @@ class mc(object):
                 "total": total
             }
             returnitems.append(Struct(returnitem))
-        return _PrettyList(returnitems)
+        return returnitems
     
     def get_matches(self, ids=[], exclude_disabled=True):
         """Get details for individual matches via their IDs, or get details for all matches if "ids" is empty. If "exclude_disabled" is False, disabled events will be included in results (only applies if "ids" is empty)."""
@@ -247,7 +231,7 @@ class mc(object):
                 "outcome": i[5]
             }
             returnitems.append(Struct(returnitem))
-        return _PrettyList(returnitems)
+        return returnitems
     
     def get_rankings(self, include_scores=False):
         """Return a list of players (or a list of tuples (player ID, score) if include_scores==True) in ranked order, where "score" indicates a player's internal score (higher is better)."""
@@ -319,7 +303,6 @@ class mc(object):
                         all_ids.remove(player_id)
                         del column_totals[index]
                         for row_index, row in enumerate(old_rows):
-                            # I see the problem... We're still deleting a certain index from newrows, even though it doesn't really exist
                             del rows[row_index][index - column_diff]
                         column_diff += 1
         
