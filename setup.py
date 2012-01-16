@@ -16,7 +16,7 @@ ez_setup.use_setuptools()
 
 from setuptools import setup
 
-from gui_wx import __description__, __copyright__, __version__
+from MasterChessGUI import __description__, __copyright__, __version__
 
 def get_folder(path):
     if isinstance(path, list):
@@ -42,7 +42,7 @@ options = {
 if sys.platform == "darwin" and "py2app" in sys.argv:
     options.update({
         "setup_requires": ["py2app"],
-        "app": ["gui_wx.py"],
+        "app": ["MasterChessGUI.py"],
         "data_files": DATA_FILES + DATA_FILES_MAC + get_folder(DATA_MODULE_PACKAGES),
         "options": {
             "py2app": {
@@ -91,7 +91,7 @@ elif sys.platform == "win32" and "py2exe" in sys.argv:
         "data_files": DATA_FILES + get_folder(DATA_MODULE_PACKAGES),
         "windows": [
             {
-                "script": "gui_wx.py",
+                "script": "MasterChessGUI.py",
                 "icon_resources": [(1, "resources/Chess.ico")],
                 "other_resources": [(u"VERSIONTAG", 1, "MasterChess " + __version__)]  # TODO: Test this!!
             }
@@ -105,7 +105,7 @@ elif sys.platform == "win32" and "py2exe" in sys.argv:
     })
 else:
     options.update({
-        "scripts": ["gui_wx.py"],
+        "scripts": ["MasterChessGUI.py"],
         "packages": DATA_MODULE_PACKAGES,
         "data_files": DATA_FILES,
         "install_requires": ["wx"]

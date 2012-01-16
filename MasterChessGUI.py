@@ -46,97 +46,31 @@ def get_local_file(relative_path):
 
 
 def get_recent_databases():
-    sp = wx.StandardPaths.Get()
-    config_dir = sp.GetUserDataDir()
-    try:
-        # Make sure directory exists
-        os.makedirs(config_dir)
-    except OSError:
-        # It may have already existed; if so, we can ignore the exception
-        if not os.path.isdir(config_dir):
-            # There was a different error on creation
-            raise
-    recentDB = os.path.join(config_dir, "MasterChess_cache")
-    
-    recentDBs = []
-    if os.path.exists(recentDB):
-        data = ""
-        with open(recentDB, "r") as f:
-            while True:
-                newdata = f.read()
-                if newdata == "":
-                    break
-                data += newdata
-        if data:
-            for d in data.splitlines():
-                if os.path.exists(d):
-                    recentDBs.append(d)
+    recentDBs = get_pref("recent_dbs")
+    if recentDBs == None:
+        recentDBs = []
+    for path in recentDBs:
+        if not os.path.exists(path):
+            recentDBs.remove(path)
+    set_pref("recent_dbs", recentDBs)
     return recentDBs
 
 def add_recent_database(path):
-    sp = wx.StandardPaths.Get()
-    config_dir = sp.GetUserDataDir()
-    try:
-        # Make sure directory exists
-        os.makedirs(config_dir)
-    except OSError:
-        # It may have already existed; if so, we can ignore the exception
-        if not os.path.isdir(config_dir):
-            # There was a different error on creation
-            raise
-    recentDB = os.path.join(config_dir, "MasterChess_cache")
-    
-    recentDBs = []
-    if os.path.exists(recentDB):
-        data = ""
-        with open(recentDB, "r") as f:
-            while True:
-                newdata = f.read()
-                if newdata == "":
-                    break
-                data += newdata
-        if data:
-            for d in data.splitlines():
-                if os.path.exists(d):
-                    recentDBs.append(d)
-    
-    if path in recentDBs:
+    recentDBs = get_pref("recent_dbs")
+    if recentDBs == None:
+        recentDBs = []
+    elif path in recentDBs:
         recentDBs.remove(path)
     recentDBs.insert(0, path)
-    with open(recentDB, "w") as f:
-        for r in recentDBs:
-            f.write(r + "\n")
+    set_pref("recent_dbs", recentDBs)
 
 def remove_recent_database(path):
-    sp = wx.StandardPaths.Get()
-    config_dir = sp.GetUserDataDir()
-    try:
-        # Make sure directory exists
-        os.makedirs(config_dir)
-    except OSError:
-        # It may have already existed; if so, we can ignore the exception
-        if not os.path.isdir(config_dir):
-            # There was a different error on creation
-            raise
-    recentDB = os.path.join(config_dir, "MasterChess_cache")
-    if os.path.exists(recentDB):
-        data = ""
-        with open(recentDB, "r") as f:
-            while True:
-                newdata = f.read()
-                if newdata == "":
-                    break
-                data += newdata
-        if data:
-            recentDBs = []
-            for d in data.splitlines():
-                if os.path.exists(d):
-                    recentDBs.append(d)
-            if path in recentDBs:
-                recentDBs.remove(path)
-                with open(recentDB, "w") as f:
-                    for r in recentDBs:
-                        f.write(r + "\n")
+    recentDBs = get_pref("recent_dbs")
+    if recentDBs == None:
+        recentDBs = []
+    elif path in recentDBs:
+        recentDBs.remove(path)
+    set_pref("recent_dbs", recentDBs)
 
 
 # Menu item functions - specified here since menu is specified in 2 places

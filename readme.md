@@ -7,7 +7,7 @@ Contents
 --------
 
 * `MasterChess` - a Python module (package) for basic chess team management
-* `gui_wx.py` - the MasterChess GUI - a graphical interface for the MasterChess module
+* `MasterChessGUI` - a graphical interface (written using wxPython) for the MasterChess module
 * `Mac components`
     * `MC-QuickLook` - a QuickLook plugin for `*.mcdb` files
     * `MC-Spotlight` - a Spotlight plugin for `*.mcdb` files
