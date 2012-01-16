@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 Requires Python 2.5 or later (well... not including Python 3)
-Also, although this uses wx and is therefore cross-platform, it looks downright ugly on Windows.
 """
 
 from __future__ import with_statement
@@ -272,9 +271,12 @@ class MainFrame(wx.Frame):
             
             self.tabIndex = 0
             self.toolbar = self.CreateToolBar(style=wx.TB_HORIZONTAL|wx.TB_TEXT)
-            self.toolbar.AddCheckLabelTool(0, "Results", wx.Bitmap(get_local_file("pie.png")))
-            self.toolbar.AddCheckLabelTool(1, "Matches", wx.Bitmap(get_local_file("match-new.png")))
-            self.toolbar.AddCheckLabelTool(2, "Players", wx.Bitmap(get_local_file("players.png")))
+            suffix = ""
+            if wx.Platform != "__WXMAC__":
+                suffix = "-24"
+            self.toolbar.AddCheckLabelTool(0, "Results", wx.Bitmap(get_local_file("pie" + suffix + ".png")))
+            self.toolbar.AddCheckLabelTool(1, "Matches", wx.Bitmap(get_local_file("match-new" + suffix + ".png")))
+            self.toolbar.AddCheckLabelTool(2, "Players", wx.Bitmap(get_local_file("players" + suffix + ".png")))
             self.toolbar.Realize()
             
             # Determine whether to invoke the special toolbar handling
@@ -603,11 +605,11 @@ class MatchesPanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         
         self.list = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_HRULES)
-        self.list.InsertColumn(0, "White Player")
+        self.list.InsertColumn(0, " White Player")
         self.list.InsertColumn(1, "Black Player")
         self.list.InsertColumn(2, "Outcome")
         self.list.InsertColumn(3, "Date")
-        sizer.Add(self.list, 1, wx.ALL | wx.EXPAND, 5)
+        sizer.Add(self.list, 1, wx.ALL | wx.EXPAND)
         
         self.Bind(wx.EVT_LIST_KEY_DOWN, self.OnListKeyDown, self.list)
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnListActivate, self.list)
@@ -692,7 +694,7 @@ class MatchesPanel(wx.Panel):
                 elif match.outcome == 2:
                     outcome = "Stalemate"
                 
-                index = self.list.InsertStringItem(sys.maxint, self.get_name(player=white_player))
+                index = self.list.InsertStringItem(sys.maxint, " " + self.get_name(player=white_player))
                 if not get_pref("dont_colorize_matches"):
                     diff = 0
                     if not self.exclude_disabled and not match.enabled:
@@ -807,12 +809,12 @@ class PlayersPanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         
         self.list = wx.ListCtrl(self, style=wx.LC_REPORT | wx.LC_HRULES)
-        self.list.InsertColumn(0, "Name")
+        self.list.InsertColumn(0, " Name")
         self.list.InsertColumn(1, "Grade")
         self.list.InsertColumn(2, "Wins")
         self.list.InsertColumn(3, "Losses")
         self.list.InsertColumn(4, "Total")
-        sizer.Add(self.list, 1, wx.ALL | wx.EXPAND, 5)
+        sizer.Add(self.list, 1, wx.ALL | wx.EXPAND)
         
         self.Bind(wx.EVT_LIST_KEY_DOWN, self.OnListKeyDown, self.list)
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnListActivate, self.list)
@@ -842,7 +844,7 @@ class PlayersPanel(wx.Panel):
                 namer = player.last_name + ", " + player.first_name
             else:
                 namer = player.first_name + " " + player.last_name
-            index = self.list.InsertStringItem(sys.maxint, namer)
+            index = self.list.InsertStringItem(sys.maxint, " " + namer)
             self.itemindexes[index] = player.id
             self.list.SetStringItem(index, 1, str(player.grade))
             self.list.SetStringItem(index, 2, str(player.stats.wins) + win_stats)
@@ -907,7 +909,9 @@ class ResultsPanel(wx.Panel):
         
         self.notebook = ResultsNotebook(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.notebook, 1, wx.ALL|wx.EXPAND, 6)
+        margin = 0
+        if wx.Platform == "__WXMAC__": margin = -3
+        sizer.Add(self.notebook, 1, wx.EXPAND | (wx.ALL ^ (wx.TOP | wx.BOTTOM)), margin)
         self.SetSizer(sizer)
         
         self.reinit()
@@ -1010,7 +1014,7 @@ class MyGridTable(wx.grid.PyGridTableBase):
         
         selrow = self.grid.GetGridCursorRow()
         selcol = self.grid.GetGridCursorCol()
-        if (selrow == row and selcol >= col) or (selcol == col and selrow >= row):
+        if wx.Platform != "__WXMSW__" and ((selrow == row and selcol >= col) or (selcol == col and selrow >= row)):
             attr.SetBackgroundColour((230, 230, 230))
         
         if row == len(self.tbl.row_headers) - 1 or col == len(self.tbl.column_headers) - 1:
@@ -1056,6 +1060,7 @@ class MyGridTable(wx.grid.PyGridTableBase):
                     
                     # Update corresponding row/col (ie. row "Adams", column "Foley" translates to row "Foley", column "Adams")
                     # TODO: We need to get col references based on player IDs, since the rows and the columns might not always be the same (well... they should be as long as we don't pass any specific IDs to get_grand_table)
+                    # TODO: This doesn't update totals at the end of the row...
                     if val - oldval == 0.5:
                         if self.tbl.rows[col][row] == None: self.tbl.rows[col][row] = 0
                         self.tbl.rows[col][row] += 0.5
@@ -1131,6 +1136,7 @@ class StatisticsTab(wx.Panel):
         self.mc = parent.mc
         
         self.curplayer = None
+        self.checklistbox_players = {}
         
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(self.sizer)
@@ -1162,13 +1168,16 @@ class StatisticsTab(wx.Panel):
         self.rightsizer.Add(self.checklabel)
         
         self.checked_players = wx.CheckListBox(self)
+        self.checklistbox_players = {}  # Since we can't set client data on a CheckListBox (crashes on Windows)
         for player in players:
             namer = ""
             if use_last_names:
                 namer = player.last_name
             else:
                 namer = player.first_name + " " + player.last_name
-            self.checked_players.Append(namer, player.id)
+            #self.checked_players.Append(namer, player.id)
+            index = self.checked_players.Append(namer)
+            self.checklistbox_players[index] = player.id
         self.rightsizer.Add(self.checked_players, 0, wx.EXPAND)
         self.select_all()
         self.Bind(wx.EVT_CHECKLISTBOX, self.CheckSelect, self.checked_players)
@@ -1229,7 +1238,7 @@ class StatisticsTab(wx.Panel):
             self.Thaw()
     
     def CheckSelect(self, event):
-        self.setup_stats([self.checked_players.GetClientData(i) for i in range(self.checked_players.GetCount()) if self.checked_players.IsChecked(i)])
+        self.setup_stats([self.checklistbox_players[i] for i in range(self.checked_players.GetCount()) if self.checked_players.IsChecked(i)])
     
     def setup_stats(self, verses=[]):
         self.textsizer.Clear(True)
@@ -1403,6 +1412,14 @@ class StartPanel(wx.Panel):
             rect = self.GetUpdateRegion().GetBox()
             dc.SetClippingRect(rect)
         dc.Clear()
+        # TODO: Common error on Windows (and, so far, Windows only):
+        """
+Traceback (most recent call last):
+  File "MasterChessGUI.py", line 1417, in OnEraseBackground
+  File "wx\_gdi.pyc", line 3459, in DrawBitmap
+wx._core.PyAssertionError: C++ assertion "bmp.Ok()" failed at ..\..\src\msw\dc.cpp(1181) in wxDC::DoDrawBitmap(): invalid bitmap in wxDC::DrawBitmap
+        """
+        # in addition to the "Can't load image from file 'C:\Documents and Settings\Jake\My Documents\resources\chess.jpg': file does not exist." which stems from here (occurs if this is called after an "Open" dialog is shown)
         bmp = wx.Bitmap(get_local_file("chess.jpg"))
         dc.DrawBitmap(bmp, 0, 0)
 
