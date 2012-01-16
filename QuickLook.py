@@ -84,6 +84,7 @@ p.bigger {
                         val = int(val)
                 except:
                     pass
+                if val == None: val = "&nbsp;"
                 if index == len(tbl.row_headers) - 1 or other_index == len(tbl.column_headers) - 1:
                     val = "<i>" + str(val) + "</i>"
                 returning += "<td>" + str(val) + "</td>"
