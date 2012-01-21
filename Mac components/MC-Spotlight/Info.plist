@@ -15,7 +15,7 @@
 			<string>MDImporter</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>com.github.jake33.masterchess.mcdb</string>
+				<string>com.github.jhartz.masterchess.mcdb</string>
 			</array>
 		</dict>
 	</array>
@@ -26,7 +26,7 @@
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
-	<string>com.github.jake33.masterchess.mdimporter</string>
+	<string>com.github.jhartz.masterchess.mdimporter</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>

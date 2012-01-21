@@ -37,7 +37,7 @@ options = {
     "author": "Jake Hartz",
     "author_email": "jake33@rocketmail.com",
     "license": "GPL",
-    "url": "http://jake33.github.com/MasterChess/"
+    "url": "http://jhartz.github.com/masterchess/"
 }
 
 if sys.platform == "darwin" and "py2app" in sys.argv:
@@ -50,12 +50,12 @@ if sys.platform == "darwin" and "py2app" in sys.argv:
                 "argv_emulation": True,
                 "iconfile": "resources/Chess.icns",
                 "plist": {
-                    "CFBundleIdentifier": "com.github.jake33.masterchess",
+                    "CFBundleIdentifier": "com.github.jhartz.masterchess",
                     "CFBundleGetInfoString": __description__,
                     "NSHumanReadableCopyright": __copyright__,
                     "UTExportedTypeDeclarations": [
                         {
-                            "UTTypeIdentifier": "com.github.jake33.masterchess.mcdb",
+                            "UTTypeIdentifier": "com.github.jhartz.masterchess.mcdb",
                             "UTTypeDescription": "MasterChess database",
                             #"UTTypeIconFile": "Chess.icns",
                             "UTTypeConformsTo": [
@@ -75,7 +75,7 @@ if sys.platform == "darwin" and "py2app" in sys.argv:
                             #"CFBundleTypeName": "MasterChess database",
                             "CFBundleTypeName": "MasterChess database",
                             "LSItemContentTypes": [
-                                "com.github.jake33.masterchess.mcdb"
+                                "com.github.jhartz.masterchess.mcdb"
                             ],
                             "CFBundleTypeRole": "Editor",
                             "LSHandlerRank": "Owner"

@@ -4,9 +4,9 @@
 
 NSData* renderMCDB(NSURL* url, BOOL smallPreview)
 {
-	//NSBundle* bundle = [NSBundle bundleWithIdentifier: @"com.github.jake33.MasterChess"];
+	//NSBundle* bundle = [NSBundle bundleWithIdentifier: @"com.github.jhartz.MasterChess"];
 	
-	NSString* path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier: @"com.github.jake33.masterchess"];
+	NSString* path = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier: @"com.github.jhartz.masterchess"];
 	NSBundle* bundle = [NSBundle bundleWithPath: path];
 	
     NSTask* task = [[NSTask alloc] init];

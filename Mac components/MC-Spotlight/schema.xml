@@ -4,7 +4,7 @@
                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                       xsi:schemaLocation="http://www.apple.com/metadata file:///System/Library/Frameworks/CoreServices.framework/Frameworks/Metadata.framework/Resources/MetadataSchema.xsd">
     <types>
-        <type name="com.github.jake33.masterchess.mcdb">
+        <type name="com.github.jhartz.masterchess.mcdb">
          
             <!-- 'allattrs' is a whitespace separated list of all of the attributes that this UTI type normally has.
                  It does not have to be exhaustive. -->
