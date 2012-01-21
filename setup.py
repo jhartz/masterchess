@@ -28,6 +28,7 @@ def get_folder(path):
 DATA_FILES = [get_folder("resources")]
 DATA_FILES_MAC = ["QuickLook.py"]
 DATA_MODULE_PACKAGES = ["MasterChess"]
+PY2EXE_BUNDLE = False
 
 options = {
     "name": "MasterChess",
@@ -95,14 +96,18 @@ elif sys.platform == "win32" and "py2exe" in sys.argv:
                 "icon_resources": [(1, "resources/Chess.ico")],
                 "other_resources": [(u"VERSIONTAG", 1, "MasterChess " + __version__)]  # TODO: Test this!!
             }
-        ],
-        #"options": {
-        #    "py2exe": {
-        #        "bundle_files": 1
-        #    }
-        #},
-        #"zipfile": None
+        ]
     })
+    if PY2EXE_BUNDLE:
+        # TODO: Why does this cause the old-style (ie. pre-Windows XP) win32 widgets to be used?
+        options.update({
+            "options": {
+                "py2exe": {
+                    "bundle_files": 1
+                }
+            },
+            "zipfile": None
+        })
 else:
     options.update({
         "scripts": ["MasterChessGUI.py"],
