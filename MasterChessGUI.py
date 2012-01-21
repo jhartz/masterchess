@@ -37,9 +37,10 @@ __license__ = "GPL"
 __version__ = "1.0"
 
 
+cwd = None
 def get_local_file(relative_path):
-    if wx.Platform == "__WXMSW__":
-        return os.path.join(os.getcwd(), "resources", relative_path)
+    if wx.Platform == "__WXMSW__" and cwd:
+        return os.path.join(cwd, "resources", relative_path)
     else:
         return os.path.join("resources", relative_path)
 
@@ -1419,7 +1420,6 @@ Traceback (most recent call last):
   File "wx\_gdi.pyc", line 3459, in DrawBitmap
 wx._core.PyAssertionError: C++ assertion "bmp.Ok()" failed at ..\..\src\msw\dc.cpp(1181) in wxDC::DoDrawBitmap(): invalid bitmap in wxDC::DrawBitmap
         """
-        # in addition to the "Can't load image from file 'C:\Documents and Settings\Jake\My Documents\resources\chess.jpg': file does not exist." which stems from here (occurs if this is called after an "Open" dialog is shown)
         bmp = wx.Bitmap(get_local_file("chess.jpg"))
         dc.DrawBitmap(bmp, 0, 0)
 
@@ -1549,5 +1549,12 @@ class MyApp(wx.App):
 
 
 if __name__ == "__main__":
+    # This is run at the beginning so we can have this stored in case something happens
+    cwd = os.getcwd()
+    try:
+        os.chdir(os.path.basename(sys.argv[0]))
+        cwd = os.getcwd()
+    except OSError:
+        pass
     app = MyApp(False)
     app.MainLoop()
