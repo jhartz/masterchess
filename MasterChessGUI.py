@@ -1361,6 +1361,14 @@ class RankingsTab(wx.Panel):
                 txt.SetToolTip(wx.ToolTip(str(round(item[1], 4))))
                 sizer.Add(txt)
             bigsizer.Add(sizer, 1, wx.ALL | wx.EXPAND, 25)
+            
+            # TODO: Add something like...
+            """
+            Only count a match if the players in the match:
+              [ ]  have played each other at least once
+              [ ]  are not tied against each other in points (one is ahead of the other)
+            """
+            # where we'll have both checkboxes unchecked by default, but the user can check the first, the second, or both, and we will update the rankings accordingly (we need to implement this in MasterChess/rankings.py)
         else:
             bigsizer.Add(wx.StaticText(self, label="You must add at least one player in the \"Players\" panel before viewing rankings."), 1, wx.ALL | wx.EXPAND, 25)
         
