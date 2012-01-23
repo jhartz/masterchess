@@ -1218,6 +1218,11 @@ class StatisticsTab(wx.Panel):
     def select_all(self):
         [self.checked_players.Check(i, True) for i in range(self.checked_players.GetCount())]
     
+    def SelectAll(self, event):
+        # Called by onclick of "Select all" button
+        self.select_all()
+        self.setup_stats()
+    
     def ChoiceSelect(self, event):
         sel = self.selector.GetSelection()
         if sel != wx.NOT_FOUND and self.selector.GetClientData(sel):
@@ -1239,7 +1244,19 @@ class StatisticsTab(wx.Panel):
             self.Thaw()
     
     def CheckSelect(self, event):
-        self.setup_stats([self.checklistbox_players[i] for i in range(self.checked_players.GetCount()) if self.checked_players.IsChecked(i)])
+        verses = [self.checklistbox_players[i] for i in range(self.checked_players.GetCount()) if self.checked_players.IsChecked(i)]
+        if len(verses) == 0:
+            player = self.mc.get_players([self.curplayer])[0]
+            self.textsizer.Clear(True)
+            mysizer = wx.BoxSizer(wx.VERTICAL)
+            mysizer.Add(wx.StaticText(self, label="You must select at least one player to compare to " + player.first_name + " " + player.last_name), 0, wx.ALL, 3)
+            all_btn = wx.Button(self, label="Select all players")
+            mysizer.Add(all_btn)
+            self.Bind(wx.EVT_BUTTON, self.SelectAll, all_btn)
+            self.textsizer.Add(mysizer)
+            self.Layout()
+        else:
+            self.setup_stats(verses)
     
     def setup_stats(self, verses=[]):
         self.textsizer.Clear(True)
