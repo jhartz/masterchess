@@ -2,15 +2,22 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{{ page.title }}</title>
-    <link rel="stylesheet" type="text/css" media="screen,tv,projection" href="/style.css">
+    <title>{{ page.title | escape }}</title>
+    <link rel="stylesheet" type="text/css" media="screen,tv,projection" href="/style.css">{% if page.longpage %}
+    <style type="text/css">
+    #content {
+        margin: 50px;
+        width: auto;
+        min-height: 100%;
+    }
+    </style>{% endif %}
 </head>
 
 <body>
-    <table style="width: 100%; height: 100%; position: absolute; left: 0; top: 0;">
-    <tbody><tr><td style="text-align: center; vertical-align: middle;">
+    <table id="bigtable" style="border: none;">
+        <tbody><tr><td style="text-align: center; vertical-align: {% if page.longpage %}top{% else %}middle{% endif %};">
         <div id="content">
-            <h2 class="topleftnav"><a href="/">Home</a></h2>
+            <div class="topleftnav"><a href="/">Home</a></div>
 
 {{ content }}
 
@@ -21,6 +28,5 @@
         <div><br><br></div>
     </td></tr></tbody>
     </table>
-
 </body>
 </html>
