@@ -114,6 +114,7 @@ class mc(object):
         
         Return details about individual players by specifying them in "ids", or get details for all players if "ids" is empty. If "verses" is specified with one or more player IDs, the stats of the players in "ids" will only reflect the games they played against the players in "verses".
         """
+        # TODO: for functions like this that accept either an array or a plain argument, maybe see if we can change it so that if we send it an array it returns an array, but if we send it a plain object it returns a plain object
         if not isinstance(ids, list):
             if ids:
                 ids = [ids]

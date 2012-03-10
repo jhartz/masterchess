@@ -1,11 +1,14 @@
 """
 Setup/build script for MasterChess
 
- Usage (Mac OS X):
-     python2.5 setup.py py2app
-
  Usage (Windows):
      python setup.py py2exe
+
+ Usage (Mac OS X):
+     python2.5 setup.py py2app
+     
+     /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -f dist/MasterChess.app
+     mdimport -d2 ~/test.mcdb
 """
 
 import os, sys, subprocess
