@@ -1559,7 +1559,7 @@ class MyApp(wx.App):
         self.load_database(filename)
     
     def MacOpenFile(self, filename):
-        # Called for files droped on the dock icon or opened via Finder
+        # Called for files dropped on the dock icon or opened via Finder
         self.load_database(filename)
     
     def MacReopenApp(self):
@@ -1577,6 +1577,7 @@ if __name__ == "__main__":
     # This is run at the beginning so we can have this stored in case something happens
     cwd = os.getcwd()
     try:
+    	# TODO: Should this be "dirname"?
         os.chdir(os.path.basename(sys.argv[0]))
         cwd = os.getcwd()
     except OSError:
