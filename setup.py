@@ -38,9 +38,9 @@ options = {
     "version": __version__,
     "description": __description__,
     "author": "Jake Hartz",
-    "author_email": "jake33@rocketmail.com",
+    "author_email": "jhartz@outlook.com",
     "license": "GPL",
-    "url": "http://jhartz.github.com/masterchess/"
+    "url": "http://jhartz.github.io/masterchess/"
 }
 
 if sys.platform == "darwin" and "py2app" in sys.argv:
