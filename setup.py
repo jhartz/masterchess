@@ -47,7 +47,7 @@ if sys.platform == "darwin" and "py2app" in sys.argv:
     options.update({
         "setup_requires": ["py2app"],
         "app": ["MasterChessGUI.py"],
-        "data_files": DATA_FILES + DATA_FILES_MAC + get_folder(DATA_MODULE_PACKAGES),
+        "data_files": DATA_FILES + DATA_FILES_MAC,
         "options": {
             "py2app": {
                 "argv_emulation": True,
@@ -92,7 +92,7 @@ elif sys.platform == "win32" and "py2exe" in sys.argv:
     import py2exe
     options.update({
         "setup_requires": ["py2exe"],
-        "data_files": DATA_FILES + get_folder(DATA_MODULE_PACKAGES),
+        "data_files": DATA_FILES,
         "windows": [
             {
                 "script": "MasterChessGUI.py",
