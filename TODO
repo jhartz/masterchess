@@ -1,0 +1,5 @@
+MasterChess TODO
+---------------
+
+- Upgrade to Python 2.7
+  - Problems with wx on 64-bit Macs... we can force the packaged .app to run in 32-bit mode using a flag in setup.py
