@@ -1,7 +1,7 @@
 MasterChess
 ===========
 
-A simple chess team management system
+A simple, cross-platform chess team management system
 
 Contents
 --------
