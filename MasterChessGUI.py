@@ -122,8 +122,11 @@ def menu_open(parent):
             msgdlg.Destroy()
     dlg.Destroy()
 
-def menu_email():
-    webbrowser.open("mailto:jake3311@gmail.com?subject=MasterChess")
+def menu_website():
+    webbrowser.open("http://jhartz.github.io/masterchess/")
+
+def menu_issuereport():
+    webbrowser.open("https://github.com/jhartz/masterchess/issues")
 
 def menu_prefs():
     PrefFrame()
@@ -243,8 +246,10 @@ class MainFrame(wx.Frame):
         menubar.Append(file_menu, "&File")
         
         help_menu = wx.Menu()
-        help_email = help_menu.Append(wx.ID_ANY, "&Email Jake Hartz", "Email Jake Hartz with any questions or problems")
-        self.Bind(wx.EVT_MENU, self.OnEmail, help_email)
+        help_website = help_menu.Append(wx.ID_ANY, "&Visit the MasterChess website", "Get information or help on the MasterChess website")
+        self.Bind(wx.EVT_MENU, self.OnWebsite, help_website)
+        help_issuereport = help_menu.Append(wx.ID_ANY, "&File an Issue Report", "File or search for an issue report on GitHub")
+        self.Bind(wx.EVT_MENU, self.OnIssueReport, help_issuereport)
         help_about = help_menu.Append(wx.ID_ABOUT, "&About MasterChess")
         self.Bind(wx.EVT_MENU, self.OnAbout, help_about)
         menubar.Append(help_menu, "&Help")
@@ -404,8 +409,11 @@ class MainFrame(wx.Frame):
     def OnAbout(self, event):
         menu_about()
     
-    def OnEmail(self, event):
-        menu_email()
+    def OnWebsite(self, event):
+        menu_website()
+    
+    def OnIssueReport(self, event):
+        menu_issuereport()
     
     def OnPrefs(self, event):
         menu_prefs()
@@ -1474,8 +1482,11 @@ class MyApp(wx.App):
     def OnAbout(self, event):
         menu_about()
     
-    def OnEmail(self, event):
-        menu_email()
+    def OnWebsite(self, event):
+        menu_website()
+    
+    def OnIssueReport(self, event):
+        menu_issuereport()
     
     def OnQuit(self, event):
         wx.Exit()
@@ -1534,8 +1545,10 @@ class MyApp(wx.App):
             menubar.Append(file_menu, "&File")
             
             help_menu = wx.Menu()
-            help_email = help_menu.Append(wx.ID_ANY, "&Email Jake Hartz", "Email Jake Hartz with any questions or problems")
-            self.Bind(wx.EVT_MENU, self.OnEmail, help_email)
+            help_website = help_menu.Append(wx.ID_ANY, "&Visit the MasterChess website", "Get information or help on the MasterChess website")
+            self.Bind(wx.EVT_MENU, self.OnWebsite, help_website)
+            help_issuereport = help_menu.Append(wx.ID_ANY, "&File an Issue Report", "File or search for an issue report on GitHub")
+            self.Bind(wx.EVT_MENU, self.OnIssueReport, help_issuereport)
             help_about = help_menu.Append(wx.ID_ABOUT, "&About MasterChess", "Information about MasterChess")
             self.Bind(wx.EVT_MENU, self.OnAbout, help_about)
             menubar.Append(help_menu, "&Help")
