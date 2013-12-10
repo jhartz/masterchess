@@ -1,6 +1,6 @@
 """
 MasterChess wxPython GUI
-Copyright (C) 2012 Jake Hartz
+Copyright (C) 2013 Jake Hartz
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,9 +32,9 @@ from MasterChess.mc import Struct
 
 __author__ = "Jake Hartz"
 __description__ = "A simple chess team management system"
-__copyright__ = "Copyright (C) 2012 Jake Hartz"
+__copyright__ = "Copyright (C) 2013 Jake Hartz"
 __license__ = "GPL"
-__version__ = "1.0"
+__version__ = "1.1pre"
 
 
 cwd = None
