@@ -1,4 +1,4 @@
----
-layout: imagegallery
----
-{{ content }}
+{% for image in page.images %}<figure>
+    <p><a rel="shadowbox[PageImages]"{% if image.caption %} title="{{ image.caption | escape }}"{% endif %} href="{{ image.url | escape }}"><img src="{% if image.thumburl %}{{ image.thumburl | escape }}{% else %}{{ image.url | escape }}{% endif %}"{% if image.id %} id="{{ image.id | escape}}"{% endif %}{% if image.caption %} alt="{{ image.caption | escape }}"{% endif %}></a></p>
+    <figcaption>{{ image.caption | escape }}</figcaption>
+</figure>{% endfor %}
