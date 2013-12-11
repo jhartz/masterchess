@@ -8,7 +8,33 @@ prettynav:
   - pre: View on
     text: GitHub
     url: https://github.com/jhartz/masterchess
+
 shadowbox: 1
+images:
+  - url: images/screenshots/home-window.png
+    id: HomeWindow
+    caption: 'Home window'
+  - url: images/screenshots/players.png
+    id: Players
+    caption: 'Players panel (allows you to add or edit players)'
+  - url: images/screenshots/matches.png
+    id: Matches
+    caption: 'Matches panel (allows you to add or edit the results for individual matches)'
+  - url: 'images/screenshots/matches-filtered.png'
+    id: Matches_filtered
+    caption: "Matches panel (filtered by a player's name)"
+  - url: images/screenshots/results-table.png
+    id: Results
+    caption: 'Results table (allows you to easily view all the matches and provides another way to add matches)'
+  - url: images/screenshots/statistics-overall.png
+    id: OverallStatistics
+    caption: 'Overall Statistics'
+  - url: images/screenshots/statistics-individual.png
+    id: IndividualStatistics
+    caption: 'Statistics for an individual player'
+  - url: images/screenshots/rankings.png
+    id: Rankings
+    caption: 'Rankings panel (ranks players according to match outcomes)'
 ---
 <h2><img style="float: right;" src="https://github.com/jhartz/masterchess/raw/master/resources/Chess-48.png">About</h2>
 <p>MasterChess is a simple, cross-platform chess team management system. It includes a Python module for the base management system and a GUI written with wxPython.</p>
@@ -22,24 +48,7 @@ shadowbox: 1
 
 <h2>Screenshots</h2>
 <p>Click on an image to view a larger, more detailed version.</p>
-{% comment %}
-NOTE: It's all run together (with the newlines commented out) to prevent spacing between the individual <figure> elements (since they're inline-block and any amount of whitespace between them would mess up the spacing).
 
-{% endcomment %}{% assign url = 'images/screenshots/home-window.png' %}{% assign thumburl = '' %}{% assign id = 'HomeWindow' %}{% assign caption = 'Home window' %}{% include screenshot.html %}{% comment %}
+{{ imagecontent }}
 
-{% endcomment %}{% assign url = 'images/screenshots/players.png' %}{% assign thumburl = '' %}{% assign id = 'Players' %}{% assign caption = 'Players panel (allows you to add or edit players)' %}{% include screenshot.html %}{% comment %}
-
-{% endcomment %}{% assign url = 'images/screenshots/matches.png' %}{% assign thumburl = '' %}{% assign id = 'Matches' %}{% assign caption = 'Matches panel (allows you to add or edit the results for individual matches)' %}{% include screenshot.html %}{% comment %}
-
-{% endcomment %}{% assign url = 'images/screenshots/matches-filtered.png' %}{% assign thumburl = '' %}{% assign id = 'Matches_filtered' %}{% assign caption = "Matches panel (filtered by a player's name)" %}{% include screenshot.html %}{% comment %}
-
-{% endcomment %}{% assign url = 'images/screenshots/results-table.png' %}{% assign thumburl = '' %}{% assign id = 'Results' %}{% assign caption = 'Results table (allows you to easily view all the matches and provides another way to add matches)' %}{% include screenshot.html %}{% comment %}
-
-{% endcomment %}{% assign url = 'images/screenshots/statistics-overall.png' %}{% assign thumburl = '' %}{% assign id = 'OverallStatistics' %}{% assign caption = 'Overall Statistics' %}{% include screenshot.html %}{% comment %}
-
-{% endcomment %}{% assign url = 'images/screenshots/statistics-individual.png' %}{% assign thumburl = '' %}{% assign id = 'IndividualStatistics' %}{% assign caption = 'Statistics for an individual player' %}{% include screenshot.html %}{% comment %}
-
-{% endcomment %}{% assign url = 'images/screenshots/rankings.png' %}{% assign thumburl = '' %}{% assign id = 'Rankings' %}{% assign caption = 'Rankings panel (ranks players according to match outcomes)' %}{% include screenshot.html %}{% comment %}
-
-{% endcomment %}
 <p class="license"><a href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width: 0;" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"></a><br>All screenshots are licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.</p>
