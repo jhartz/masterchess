@@ -10,7 +10,9 @@ prettynav:
     url: https://github.com/jhartz/masterchess
 
 shadowbox: 1
-images:
+
+# For use below (easier to write it out here)
+screenshots:
   - url: images/screenshots/home-window.png
     id: HomeWindow
     caption: 'Home window'
@@ -48,7 +50,7 @@ images:
 
 <h2>Screenshots</h2>
 <p>Click on an image to view a larger, more detailed version.</p>
-<!-- 3 -->
-{% include imagegallery.html %}
+
+{% assign gallery = 'Screenshots' %}{% assign imagegallery = page.screenshots %}{% include imagegallery.html %}
 
 <p class="license"><a href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width: 0;" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"></a><br>All screenshots are licensed under a <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.</p>
