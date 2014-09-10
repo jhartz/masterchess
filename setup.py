@@ -95,7 +95,6 @@ elif sys.platform == "win32" and "py2exe" in sys.argv:
         ]
     })
     if PY2EXE_BUNDLE:
-        # TODO: Why does this cause the old-style (ie. pre-Windows XP) win32 widgets to be used?
         options.update({
             "options": {
                 "py2exe": {
