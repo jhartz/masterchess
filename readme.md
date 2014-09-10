@@ -10,7 +10,25 @@ A simple, cross-platform chess team management system
     - `MC-QuickLook` - a QuickLook plugin for `*.mcdb` files
     - `MC-Spotlight` - a Spotlight plugin for `*.mcdb` files
 
+## Using the MasterChess module
+
+To explore the module, open the Python interactive shell in the `masterchess` directory. Then, try:
+
+```python
+import MasterChess
+help(MasterChess)
+help(MasterChess.mc)
+```
+
+## Using the MasterChess GUI
+
+This is a graphical interface for the MasterChess module written in wxPython.
+
+Just run `python MasterChessGUI.py` to run it. (For more details, see "Building the MasterChess GUI")
+
 ## Building the MasterChess GUI
+
+These methods use the `setup.py` file to package the MasterChess GUI into an OS-specific executable.
 
 ### Windows
 
@@ -51,7 +69,5 @@ Requirements:
 - Python 2.x (tested with Python 2.7)
 - wxPython (tested with the GTK version)
 - setuptools (if you plan to use setup.py)
-
-To run the GUI: `python2 MasterChess.py`
 
 To build and install as a package: `python2 setup.py build` and `python2.5 setup.py install` (You may have to delve into the `setup.py` file and tweak it for your situation.)
