@@ -1028,6 +1028,7 @@ class MyGridTable(wx.grid.PyGridTableBase):
         
         if row == len(self.tbl.row_headers) - 1 or col == len(self.tbl.column_headers) - 1:
             attr.SetReadOnly(True)
+            # TODO: The following line tends to cause this error on Windows: wx._core.PyAssertionError: C++ assertion "wxFontEnumerator::IsValidFacename(font.GetFaceName())" failed at ..\..\src\msw\settings.cpp(301) in wxSystemSettingsNative::GetFont():
             attr.SetFont(wx.Font(wx.SystemSettings.GetFont(0).GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.FONTWEIGHT_BOLD))
             attr.SetBackgroundColour((190, 190, 190))
         return attr
