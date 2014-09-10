@@ -1387,25 +1387,29 @@ class RankingsTab(wx.Panel):
 class StartPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-        self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
+        if wx.Platform != "__WXMSW__":
+            self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.frame = parent
         self.recentDB_buttons = []
         
         bigsizer = wx.BoxSizer(wx.VERTICAL)
         
-        if wx.Platform == "__WXMSW__":
-            bigtitle = wx.StaticText(self, label="Welcome to MasterChess!", style=wx.ALIGN_CENTER)
-            bigtitle.SetFont(wx.Font(36, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-            bigtitle.SetBackgroundColour(wx.Colour(red=220, blue=220, green=255, alpha=160))
-            bigsizer.Add(bigtitle, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 8)
-        else:
-            bigsizer.Add(wx.StaticBitmap(self, bitmap=wx.Bitmap(get_local_file("MasterChess-small.png"))), 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 8)
+        #if wx.Platform == "__WXMSW__":
+        #    bigtitle = wx.StaticText(self, label="Welcome to MasterChess!", style=wx.ALIGN_CENTER)
+        #    bigtitle.SetFont(wx.Font(36, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+        #    bigtitle.SetBackgroundColour(wx.Colour(red=220, blue=220, green=255, alpha=160))
+        #    bigsizer.Add(bigtitle, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 8)
+        #else:
+        bigsizer.Add(wx.StaticBitmap(self, bitmap=wx.Bitmap(get_local_file("MasterChess-small.png"))), 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 8)
         
         bigsizer.Add(wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER), 0)
         
         if wx.Platform == "__WXMAC__":
             self.ButtonA = wx.lib.buttons.ThemedGenButton(self, label="Create a New Database", style=wx.ALIGN_CENTER)
             self.ButtonB = wx.lib.buttons.ThemedGenButton(self, label="Open an Existing Database", style=wx.ALIGN_CENTER)
+        elif wx.Platform == "__WXMSW__":
+            self.ButtonA = wx.Button(self, label="Create a New Database")
+            self.ButtonB = wx.Button(self, label="Open an Existing Database")
         else:
             self.ButtonA = wx.Button(self, label="Create a New Database", style=wx.ALIGN_CENTER)
             self.ButtonB = wx.Button(self, label="Open an Existing Database", style=wx.ALIGN_CENTER)
@@ -1446,13 +1450,6 @@ class StartPanel(wx.Panel):
             rect = self.GetUpdateRegion().GetBox()
             dc.SetClippingRect(rect)
         dc.Clear()
-        # TODO: Common error on Windows (and, so far, Windows only):
-        """
-Traceback (most recent call last):
-  File "MasterChessGUI.py", line 1417, in OnEraseBackground
-  File "wx\_gdi.pyc", line 3459, in DrawBitmap
-wx._core.PyAssertionError: C++ assertion "bmp.Ok()" failed at ..\..\src\msw\dc.cpp(1181) in wxDC::DoDrawBitmap(): invalid bitmap in wxDC::DrawBitmap
-        """
         bmp = wx.Bitmap(get_local_file("chess.jpg"))
         dc.DrawBitmap(bmp, 0, 0)
 
