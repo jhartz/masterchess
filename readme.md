@@ -24,7 +24,7 @@ help(MasterChess.mc)
 
 This is a graphical interface for the MasterChess module written in wxPython.
 
-Just run `python MasterChessGUI.py` to run it. (For more details, see "Building the MasterChess GUI")
+Just run `python MasterChessGUI.py` to run it. (For more details, see the OS-specific info in "Building the MasterChess GUI.")
 
 ## Building the MasterChess GUI
 

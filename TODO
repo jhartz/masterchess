@@ -1,7 +1,0 @@
-MasterChess TODO
----------------
-
-- We don't need the MasterChess package as part of the resources for setup.py py2app
-- Upgrade to Python 2.7
-  - Problems with wx on 64-bit Macs... we can force the packaged .app to run in 32-bit mode using a flag in setup.py
-- Either update ez_setup or move away from it
