@@ -6,10 +6,6 @@ For usage info, see readme.md
 
 import os, sys, subprocess
 from distutils.dir_util import copy_tree
-
-import ez_setup
-ez_setup.use_setuptools()
-
 from setuptools import setup
 
 from MasterChessGUI import __description__, __copyright__, __version__
